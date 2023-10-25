@@ -84,30 +84,3 @@ SELECT *, (RollingPeopleVac/population)*100
 FROM PopvsVac
 
 
---temp table
-
-Create TEMP Table PercentPopulationVaccinated
-(
-	continent nvarchar(255),
-	location nvarchar(255),
-	date datetime,
-	population numeric,
-	new_vaccinations numeric,
-	RollingPeopleVac numeric
-)
-
-INSERT INTO PercentPopulationVaccinated
-VALUES (
-SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
-, SUM(Cast(vac.new_vaccinations as int)) OVER (Partition by dea.location ORDER by dea.location, dea.date) as RollingPeopleVac
-FROM public.vaccination vac
-Join public.deaths dea
-	On dea.location = vac.location AND dea.date = vac.date
-WHERE continent is not null
-)
-	
-	
-	
-	
-SELECT *, (RollingPeopleVac/population)*100
-FROM PercentPopulationVaccinated
